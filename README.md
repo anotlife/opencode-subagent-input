@@ -40,28 +40,44 @@ There is no config flag for this — hence this plugin.
 
 ## Install
 
-### Global (recommended)
+### Global
+
+> ⚠️ **Do not list the bare name `"opencode-subagent-input"` unless it is published to npm.**
+> OpenCode resolves a bare plugin name by installing it from npm into
+> `~/.cache/opencode/packages/<name>@<version>`. For an unpublished name that install
+> produces an **empty directory** and the plugin **silently never loads**.
+> A **local file path** bypasses the installer and is imported directly — the same
+> mechanism the built-in `./herdr-tui-session.js` example uses.
+
+Install the package…
 
 ```bash
-# from GitHub
 cd ~/.config/opencode
 bun add github:anotlife/opencode-subagent-input
 # or: npm i github:anotlife/opencode-subagent-input
-
-# from a local checkout
-bun add /path/to/opencode-subagent-input
+# or from a local checkout: bun add /path/to/opencode-subagent-input
 ```
 
-Then add the package name to `~/.config/opencode/tui.json`:
+…then create a tiny local shim at `~/.config/opencode/opencode-subagent-input.js`:
+
+```js
+export { default } from "opencode-subagent-input"
+```
+
+…and reference the **shim path** in `~/.config/opencode/tui.json`:
 
 ```json
 {
   "$schema": "https://opencode.ai/tui.json",
-  "plugin": ["opencode-subagent-input"]
+  "plugin": ["./opencode-subagent-input.js"]
 }
 ```
 
 Restart OpenCode. (TUI plugins load at startup.)
+
+> The shim keeps `bun update opencode-subagent-input` working. If you would rather not use
+> a shim, copy the built `dist/tui.js` somewhere and point `plugin` at it directly — or
+> publish the package to npm and use the bare name.
 
 ### Project-local
 
@@ -163,10 +179,20 @@ cd ~/.config/opencode
 bun add github:anotlife/opencode-subagent-input
 ```
 
+⚠️ **不要**在 `tui.json` 里直接写裸包名 `"opencode-subagent-input"`（除非已发布到 npm）：
+opencode 遇到裸包名会去 `~/.cache/opencode/packages/` 从 npm 安装，未发布的包只会得到一个**空目录**，
+插件**静默失效**。正确做法是走**本地文件路径**：
+
+新建 `~/.config/opencode/opencode-subagent-input.js`：
+
+```js
+export { default } from "opencode-subagent-input"
+```
+
 然后编辑 `~/.config/opencode/tui.json`：
 
 ```json
-{ "$schema": "https://opencode.ai/tui.json", "plugin": ["opencode-subagent-input"] }
+{ "$schema": "https://opencode.ai/tui.json", "plugin": ["./opencode-subagent-input.js"] }
 ```
 
 重启 OpenCode。

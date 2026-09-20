@@ -25,8 +25,14 @@ var FALLBACK_THEME = {
   borderActive: "#00aaff",
   error: "#ff5555"
 };
+var log = (...a) => {
+  try {
+    console.error("[subagent-input]", ...a);
+  } catch {}
+};
 var tui = async (api) => {
   try {
+    log("init; api keys =", Object.keys(api || {}).join(","));
     const [visible, setVisible] = createSignal(false);
     const [value, setValue] = createSignal("");
     const [sending, setSending] = createSignal(false);
@@ -56,6 +62,7 @@ var tui = async (api) => {
       }
     };
     const open = () => {
+      log("open requested; sid =", currentSessionID(), "child =", isChildSession());
       if (!currentSessionID())
         return;
       try {
@@ -191,7 +198,7 @@ var tui = async (api) => {
     });
     api.keymap.registerLayer({
       priority: 900,
-      enabled: () => isChildSession() && !visible(),
+      enabled: () => !!currentSessionID() && !visible(),
       commands: [{
         namespace: "palette",
         name: CMD_OPEN,
@@ -199,7 +206,7 @@ var tui = async (api) => {
         desc: "Type into the current subagent (child) session",
         category: "Plugin",
         slashName: "subagent-input",
-        enabled: () => isChildSession(),
+        enabled: () => !!currentSessionID(),
         run: () => open()
       }],
       bindings: [{
@@ -219,10 +226,15 @@ var tui = async (api) => {
         cmd: CMD_CLOSE
       }]
     });
-  } catch (e) {
     try {
-      console.error("[opencode-subagent-input] init failed", e);
+      api.ui.toast({
+        variant: "info",
+        message: "opencode-subagent-input loaded (debug)"
+      });
     } catch {}
+    log("registered OK");
+  } catch (e) {
+    log("init failed", String(e && e.stack || e));
   }
 };
 var tui_default = {

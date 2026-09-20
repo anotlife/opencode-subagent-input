@@ -1,0 +1,43 @@
+{
+  "name": "opencode-subagent-input",
+  "version": "1.0.0",
+  "description": "OpenCode TUI plugin: type directly into a subagent (child) session. The built-in TUI hides the prompt box for child sessions; this adds one back.",
+  "type": "module",
+  "license": "MIT",
+  "author": "anotlife",
+  "main": "./dist/tui.js",
+  "exports": {
+    ".": "./dist/tui.js",
+    "./tui": "./dist/tui.js"
+  },
+  "oc-plugin": [
+    "tui"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "bun run build.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@opentui/core": "^0.4.5",
+    "@opentui/solid": "^0.4.5",
+    "solid-js": "1.9.12"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "^1.18.2",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "opencode-tui-plugin",
+    "tui",
+    "subagent",
+    "child-session"
+  ]
+}

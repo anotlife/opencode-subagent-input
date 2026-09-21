@@ -27,15 +27,8 @@ const FALLBACK_THEME = {
  * opens a small input overlay and submits straight into the session you are
  * already viewing via `client.session.promptAsync`.
  */
-const log = (...a: any[]) => {
-  try {
-    console.error("[subagent-input]", ...a)
-  } catch {}
-}
-
 const tui = async (api: any) => {
   try {
-    log("init; api keys =", Object.keys(api || {}).join(","))
     const [visible, setVisible] = createSignal(false)
     const [value, setValue] = createSignal("")
     const [sending, setSending] = createSignal(false)
@@ -68,7 +61,6 @@ const tui = async (api: any) => {
     }
 
     const open = () => {
-      log("open requested; sid =", currentSessionID(), "child =", isChildSession())
       if (!currentSessionID()) return
       try {
         prevFocus = (api.renderer && api.renderer.currentFocusedRenderable) || null
@@ -168,7 +160,7 @@ const tui = async (api: any) => {
 
     api.keymap.registerLayer({
       priority: 900,
-      enabled: () => !!currentSessionID() && !visible(),
+      enabled: () => isChildSession() && !visible(),
       commands: [
         {
           namespace: "palette",
@@ -177,7 +169,7 @@ const tui = async (api: any) => {
           desc: "Type into the current subagent (child) session",
           category: "Plugin",
           slashName: "subagent-input",
-          enabled: () => !!currentSessionID(),
+          enabled: () => isChildSession(),
           run: () => open(),
         },
       ],
@@ -190,12 +182,8 @@ const tui = async (api: any) => {
       commands: [{ name: CMD_CLOSE, run: () => close() }],
       bindings: [{ key: "escape", cmd: CMD_CLOSE }],
     })
-    try {
-      api.ui.toast({ variant: "info", message: "opencode-subagent-input loaded (debug)" })
-    } catch {}
-    log("registered OK")
   } catch (e) {
-    log("init failed", String((e && e.stack) || e))
+    console.error("[opencode-subagent-input] init failed", e)
   }
 }
 
